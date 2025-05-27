@@ -1,14 +1,16 @@
 package logic;
 
+import pbjam.beans.Match;
+import pbjam.beans.Player;
+import pbjam.beans.Tournament;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import pbjam.beans.Player;
 
 public class ProfileManager {
 
     public void viewProfile(Player player) {
-        System.out.println(player);
+        System.out.println(player); // relies on Player.toString()
     }
 
     public void editPhoneNumber(Player player, String newNumber) {
@@ -20,10 +22,10 @@ public class ProfileManager {
         player.setLocation(newLocation);
         System.out.println("Location updated.");
     }
-    
-    //match not created yet
-    public void viewMatchHist() {
-        if (matchHistory.isEmpty()) {
+
+    public void viewMatchHist(Player player) {
+        List<Match> matchHistory = player.getMatchHistory();
+        if (matchHistory == null || matchHistory.isEmpty()) {
             System.out.println("No match history available.");
         } else {
             System.out.println("Match History:");
@@ -32,17 +34,14 @@ public class ProfileManager {
             }
         }
     }
-    
-    //friend not created yet
-    public void addFriend(Player friend) {
-        if (friend == null) {
-            System.out.println("Cannot add a null friend.");
+
+    public void addFriend(Player player, Player friend) {
+        if (friend == null || player.equals(friend)) {
+            System.out.println("Invalid friend.");
             return;
         }
-        if (this.equals(friend)) {
-            System.out.println("Cannot add yourself as a friend.");
-            return;
-        }
+
+        List<Player> friends = player.getFriends();
         if (friends.contains(friend)) {
             System.out.println(friend.getName() + " is already your friend.");
         } else {
@@ -50,19 +49,20 @@ public class ProfileManager {
             System.out.println(friend.getName() + " has been added to your friends list.");
         }
     }
-    
-    public List<Player> findMatch(List<Player> allPlayers) {
+
+    public List<Player> findMatch(Player player, List<Player> allPlayers) {
         List<Player> potentialMatches = new ArrayList<>();
-        for (Player player : allPlayers) {
-            if (!this.equals(player) && Math.abs(this.duprSingles - player.duprSingles) <= 0.5) {
-                potentialMatches.add(player);
+        for (Player other : allPlayers) {
+            if (!player.equals(other) && Math.abs(player.getDuprSingles() - other.getDuprSingles()) <= 0.5) {
+                potentialMatches.add(other);
             }
         }
         return potentialMatches;
     }
-    
-    public void viewTournaments() {
-        if (tournaments.isEmpty()) {
+
+    public void viewTournaments(Player player) {
+        List<Tournament> tournaments = player.getTournaments();
+        if (tournaments == null || tournaments.isEmpty()) {
             System.out.println("No tournaments available.");
         } else {
             System.out.println("Tournaments:");
